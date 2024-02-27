@@ -14,21 +14,27 @@ public class Parser {
      * @return Adjacency list
      */
     private static ArrayList<Map<Integer, Integer>> data;
+
     public static ArrayList<Map<Integer, Integer>> parse(int[][] adjMatrix) {
-        data = new ArrayList<>();
-        for(int i = 0; i < adjMatrix[0].length; i++){
-            data.add(i, (new HashMap<>()));
+        initializeDataList();
+        for (int i = 0; i < adjMatrix.length; i++) {
+            data.add(new HashMap<>());
         }
-        for(int i = 0; i < adjMatrix[0].length; i++){
-            for(int j = 0; j < adjMatrix.length; j++){
-                if(adjMatrix[i][j] != Integer.MAX_VALUE){
-                    data.get(i).put(j,adjMatrix[i][j]);
+
+        for (int i = 0; i < adjMatrix.length; i++) {
+            for (int j = 0; j < adjMatrix[i].length; j++) {
+                if (adjMatrix[i][j] != Integer.MAX_VALUE) {
+                    data.get(i).put(j, adjMatrix[i][j]);
                 }
             }
         }
+
         return data;
     }
 
+    private static void initializeDataList() {
+        data = new ArrayList<>();
+    }
 
     /**
      * Parse an adjacency matrix into an adjacency list with incoming edges instead of outgoing edges.
