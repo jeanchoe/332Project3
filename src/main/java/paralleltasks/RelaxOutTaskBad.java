@@ -1,5 +1,7 @@
 package paralleltasks;
 
+import cse332.exceptions.NotYetImplementedException;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
@@ -10,52 +12,55 @@ public class RelaxOutTaskBad extends RecursiveAction {
 
     public static final ForkJoinPool pool = new ForkJoinPool();
     public static final int CUTOFF = 1;
-    private final int top;
-    private final int bot;
+    private final int lo;
+    private final int hi;
     private final int[] firstList;
     private final int[] secondList;
     private final int[] pointVal;
 
     private final ArrayList<Map<Integer, Integer>> g;
 
-    public RelaxOutTaskBad(int[] firstList, int[] secondList, int[] pointVal,
-                        int top, int bot, ArrayList<Map<Integer, Integer>>g) {
+    public RelaxOutTaskBad(int[] firstList, int[] secondList, int[] pointVal, int lo, int hi, ArrayList<Map<Integer, Integer>> g) {
         this.firstList = firstList;
         this.secondList = secondList;
         this.pointVal = pointVal;
-        this.top = top;
-        this.bot = bot;
+        this.lo = lo;
+        this.hi = hi;
         this.g = g;
     }
 
     protected void compute() {
-        if(top - bot > CUTOFF){
+        if (hi - lo > CUTOFF) {
+
         } else {
-            sequential(bot, top, firstList, secondList, pointVal, g);
+            sequential(lo, hi, firstList, secondList, pointVal, g);
+            return;
         }
-        RelaxOutTaskBad leftSide = new RelaxOutTaskBad(firstList, secondList, pointVal, bot, bot + (top - bot) / 2, g);
+
+        RelaxOutTaskBad leftSide = new RelaxOutTaskBad(firstList, secondList, pointVal, lo, lo + (hi - lo) / 2, g);
         leftSide.fork();
-        RelaxOutTaskBad rightSide = new RelaxOutTaskBad(firstList, secondList, pointVal, bot + (top - bot) / 2, top, g);
+        RelaxOutTaskBad rightSide = new RelaxOutTaskBad(firstList, secondList, pointVal, lo + (hi - lo) / 2, hi, g);
         rightSide.compute();
         leftSide.join();
     }
 
-    public static void sequential(int bot, int top, int[] firstList, int[] secondList, int[] pointVal, ArrayList<Map<Integer, Integer>>g) {
-        int low = bot;
+    public static void sequential(int lo, int hi, int[] firstList, int[] secondList, int[] pointVal, ArrayList<Map<Integer, Integer>> g) {
+
+        int k = lo;
         do {
-            Set<Integer> v = g.get(low).keySet();
-            for (int i : v) {
-                if (secondList[low] != Integer.MAX_VALUE && firstList[i] > secondList[low] + g.get(low).get(i)) {
-                    firstList[i] = secondList[low] + g.get(low).get(i);
-                    pointVal[i] = low;
+            Set<Integer> v = g.get(k).keySet();
+            for (int j : v) {
+                if (secondList[k] != Integer.MAX_VALUE && firstList[j] > secondList[k] + g.get(k).get(j)) {
+                    firstList[j] = secondList[k] + g.get(k).get(j);
+                    pointVal[j] = k;
                 }
             }
-            low++;
-        } while(low < top);
+            k++;
+        } while(k<hi);
 
     }
 
-    public static void parallel(int[] firstList, int[] secondList, int[] pointVal, ArrayList<Map<Integer, Integer>>g) {
+    public static void parallel(int[] firstList, int[] secondList, int[] pointVal,  ArrayList<Map<Integer, Integer>> g) {
         pool.invoke(new RelaxOutTaskBad(firstList, secondList, pointVal, 0, g.size(), g));
     }
 
