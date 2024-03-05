@@ -42,7 +42,27 @@ public class Parser {
      * @return Adjacency list of maps from node to weight with incoming edges
      */
     public static ArrayList<Map<Integer, Integer>> parseInverse(int[][] adjMatrix) {
-        throw new NotYetImplementedException();
+        if(adjMatrix == null){
+            throw new IllegalArgumentException();
+        }
+        ArrayList<Map<Integer, Integer>> adjList = new ArrayList<>();
+        int first = adjMatrix[0].length;
+        int second = 0;
+        do{
+            adjList.add(second, new HashMap<>());
+            second++;
+        } while(second < first);
+        int x = 0;
+        do {
+            for(int i = 0; i < adjMatrix.length; i++){
+                if(adjMatrix[i][x] == Integer.MAX_VALUE){
+                } else {
+                    adjList.get(x).put(i,adjMatrix[i][x]);
+                }
+            }
+            x++;
+        } while(x < adjMatrix[0].length);
+        return adjList;
     }
 
 }

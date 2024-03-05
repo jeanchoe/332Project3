@@ -1,6 +1,6 @@
 package paralleltasks;
 
-import cse332.exceptions.NotYetImplementedException;
+
 
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
@@ -19,16 +19,33 @@ public class ArrayCopyTask extends RecursiveAction {
     private final int[] src, dst;
     private final int lo, hi;
 
-    public static void sequential() {
-        throw new NotYetImplementedException();
-    }
-
-    public ArrayCopyTask(int[] src, int[] dst, int lo, int hi) {
-        throw new NotYetImplementedException();
-    }
-
     @SuppressWarnings("ManualArrayCopy")
     protected void compute() {
-        throw new NotYetImplementedException();
+
+        if (hi - lo > CUTOFF) {
+        } else {
+            int i = lo;
+            do{
+                this.dst[i] = this.src[i];
+                i++;
+            } while(i<hi);
+            return;
+        }
+
+
+
+        ArrayCopyTask left = new ArrayCopyTask(src, dst, lo,   lo + (hi - lo) / 2);
+        left.fork();
+        ArrayCopyTask right = new ArrayCopyTask(src, dst,   lo + (hi - lo) / 2, hi);
+        right.compute();
+        left.join();
     }
+    public ArrayCopyTask(int[] src, int[] dst, int lo, int hi) {
+        this.src = src;
+        this.dst = dst;
+        this.lo = lo;
+        this.hi = hi;
+    }
+
+
 }
